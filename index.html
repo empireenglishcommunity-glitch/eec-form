@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0A0A0F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Empire English Community — نموذج الانضمام</title>
+<link rel="icon" href="https://empireenglish.online/logo-sm.png">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Cinzel:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+/* ═══ EMPIRE DESIGN SYSTEM — Dark/Gold Theme ═══ */
+:root {
+  --gold: #D4AF37;
+  --gold-light: #e8d48b;
+  --gold-muted: #8b7355;
+  --bg-primary: #0A0A0F;
+  --bg-card: #111118;
+  --bg-secondary: #0D1117;
+  --text-primary: #F5F0E8;
+  --text-secondary: #8B919A;
+  --bronze: #cd7f32;
+  --emerald: #4ade80;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+html{scroll-behavior:smooth}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg-primary);
+  color:var(--text-primary);
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden;
+}
+
+/* Noise texture overlay */
+body::before{
+  content:'';position:fixed;inset:0;opacity:.015;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* Radial glow background */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(212,175,55,0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(212,175,55,0.02) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(26,26,46,0.5) 0%, transparent 50%);
+}
+
+::selection{background-color:var(--gold);color:var(--bg-primary)}
+
+/* ─── Particles ─── */
+.particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.particle{
+  position:absolute;width:2px;height:2px;border-radius:50%;
+  background:var(--gold);opacity:0;
+  animation:floatUp var(--dur) linear infinite;
+  animation-delay:var(--delay);
+  left:var(--x);bottom:-10px;
+}
+@keyframes floatUp{
+  0%{transform:translateY(0) translateX(0);opacity:0}
+  10%{opacity:.4}
+  90%{opacity:.15}
+  100%{transform:translateY(-100vh) translateX(20px);opacity:0}
+}
+
+/* ─── Layout ─── */
+.wrap{max-width:620px;margin:0 auto;padding:1.5rem 1rem 4rem;position:relative;z-index:1}
+
+/* ─── Hero ─── */
+.hero{
+  text-align:center;padding:2.5rem 1.5rem 2rem;margin-bottom:1.5rem;
+  border:1px solid rgba(212,175,55,0.1);border-radius:16px;
+  background:rgba(13,17,23,0.8);backdrop-filter:blur(12px);
+}
+.hero-crown{font-size:48px;margin-bottom:.75rem;animation:crownFloat 4s ease-in-out infinite}
+@keyframes crownFloat{50%{transform:translateY(-8px)}}
+.hero-logo{font-family:'Cinzel',serif;font-size:11px;font-weight:600;letter-spacing:3px;color:var(--gold-muted);margin-bottom:.75rem}
+.hero h1{
+  font-family:'Cairo',sans-serif;font-size:clamp(22px,5vw,28px);font-weight:900;
+  background:linear-gradient(135deg,var(--gold) 0%,var(--gold-light) 25%,var(--gold) 50%,var(--gold-muted) 75%,var(--gold) 100%);
+  background-size:200% 200%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shimmer 4s ease-in-out infinite;
+  margin-bottom:.6rem;
+}
+@keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.hero p{font-family:'Cairo',sans-serif;font-size:14px;color:var(--text-secondary);line-height:1.8}
+
+/* ─── Progress Bar ─── */
+.prog-wrap{margin-top:1.25rem}
+.prog-bar{height:3px;background:rgba(212,175,55,0.1);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--bronze));border-radius:4px;transition:width .5s ease}
+.prog-label{font-family:'Cairo',sans-serif;font-size:11px;color:var(--gold-muted);margin-top:.4rem;text-align:left}
+
+/* ─── Steps ─── */
+.step{display:none}
+.step.active{display:block;animation:slideIn .4s ease-out}
+@keyframes slideIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── Question Card ─── */
+.q-card{
+  background:var(--bg-card);border:1px solid rgba(212,175,55,0.1);
+  border-radius:14px;padding:1.75rem;margin-bottom:1rem;
+  position:relative;overflow:hidden;
+}
+.q-card::after{
+  content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:linear-gradient(45deg,transparent 40%,rgba(212,175,55,0.03) 50%,transparent 60%);
+  transform:translateX(-100%);transition:transform .6s ease;pointer-events:none;
+}
+.q-card:hover::after{transform:translateX(100%)}
+.q-num{font-family:'Cinzel',serif;font-size:11px;font-weight:600;color:var(--gold);letter-spacing:2px;margin-bottom:.6rem}
+.q-label{font-family:'Cairo',sans-serif;font-size:17px;font-weight:700;color:var(--text-primary);line-height:1.6;margin-bottom:.5rem}
+.q-hint{
+  font-family:'Cairo',sans-serif;font-size:13px;color:var(--text-secondary);line-height:1.8;
+  background:rgba(212,175,55,0.03);border:1px solid rgba(212,175,55,0.08);
+  padding:.7rem 1rem;border-radius:10px;margin-bottom:1rem;
+  border-right:3px solid var(--gold);
+}
+
+/* ─── Inputs ─── */
+textarea,input[type=text]{
+  width:100%;border:1.5px solid rgba(212,175,55,0.15);border-radius:10px;
+  padding:.9rem 1.1rem;font-size:15px;font-family:'Cairo',sans-serif;
+  color:var(--text-primary);background:rgba(13,17,23,0.6);
+  resize:vertical;min-height:100px;line-height:1.7;direction:rtl;
+  transition:border-color .3s,box-shadow .3s;
+}
+input[type=text]{min-height:auto;height:50px;resize:none}
+textarea:focus,input[type=text]:focus{
+  outline:none;border-color:var(--gold);
+  box-shadow:0 0 15px rgba(212,175,55,0.1),0 0 5px rgba(212,175,55,0.15);
+  background:rgba(13,17,23,0.9);
+}
+textarea::placeholder,input::placeholder{color:rgba(139,145,154,0.5)}
+
+/* ─── Scale Buttons ─── */
+.scale-wrap{display:flex;gap:6px;flex-wrap:wrap;margin:.6rem 0}
+.scale-btn{
+  width:46px;height:46px;border-radius:10px;
+  border:1.5px solid rgba(212,175,55,0.15);background:rgba(13,17,23,0.6);
+  color:var(--text-secondary);font-size:15px;font-weight:600;cursor:pointer;
+  transition:all .2s;font-family:'Inter',sans-serif;
+}
+.scale-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,0.05)}
+.scale-btn.sel{
+  background:rgba(212,175,55,0.15);border-color:var(--gold);color:var(--gold);
+  box-shadow:0 0 10px rgba(212,175,55,0.2);transform:scale(1.05);
+}
+.scale-labels{display:flex;justify-content:space-between;font-family:'Cairo',sans-serif;font-size:11px;color:var(--text-secondary);margin-top:.4rem}
+.scale-sub{margin-top:1.1rem}
+.scale-sub label{font-family:'Cairo',sans-serif;font-size:13px;color:var(--gold-muted);display:block;margin-bottom:.4rem;font-weight:600}
+
+/* ─── Commit Prefix ─── */
+.commit-prefix{
+  font-family:'Cairo',sans-serif;font-size:14px;color:var(--gold);
+  padding:.7rem 1rem;background:rgba(212,175,55,0.05);
+  border-radius:8px;border-right:3px solid var(--gold);
+  margin-bottom:.75rem;font-weight:600;
+}
+
+/* ─── Error Messages ─── */
+.err{
+  font-family:'Cairo',sans-serif;font-size:12px;color:#e74c3c;
+  margin-top:.6rem;display:none;padding:.5rem .8rem;
+  background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.15);
+  border-radius:8px;
+}
+
+/* ─── Navigation ─── */
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;gap:.75rem}
+.btn-next{
+  background:linear-gradient(135deg,var(--gold),var(--bronze));
+  color:var(--bg-primary);border:none;border-radius:10px;
+  padding:.85rem 2rem;font-size:14px;font-weight:700;cursor:pointer;
+  font-family:'Cairo',sans-serif;transition:all .2s;flex-shrink:0;
+  box-shadow:0 4px 15px rgba(212,175,55,0.2);
+}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(212,175,55,0.35)}
+.btn-next:active{transform:translateY(0)}
+.btn-back{
+  background:transparent;color:var(--gold-muted);
+  border:1.5px solid rgba(212,175,55,0.15);
+  border-radius:10px;padding:.85rem 1.25rem;font-size:13px;
+  cursor:pointer;font-family:'Cairo',sans-serif;transition:all .2s;
+}
+.btn-back:hover{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,0.03)}
+.step-lbl{font-family:'Cinzel',serif;font-size:12px;color:var(--text-secondary);white-space:nowrap;letter-spacing:1px}
+
+/* ─── Done Screen ─── */
+.done-wrap{
+  background:var(--bg-card);border:1px solid rgba(212,175,55,0.15);
+  border-radius:16px;padding:3rem 2rem;text-align:center;
+}
+.done-icon{
+  width:72px;height:72px;background:rgba(212,175,55,0.08);
+  border:2px solid rgba(212,175,55,0.2);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 1.5rem;font-size:32px;
+  animation:pulse-glow 3s ease-in-out infinite;
+}
+@keyframes pulse-glow{
+  0%,100%{box-shadow:0 0 5px rgba(212,175,55,0.2),0 0 10px rgba(212,175,55,0.1)}
+  50%{box-shadow:0 0 15px rgba(212,175,55,0.4),0 0 30px rgba(212,175,55,0.2)}
+}
+.done-badge{
+  display:inline-block;font-family:'Cinzel',serif;
+  background:rgba(212,175,55,0.08);color:var(--gold);
+  font-size:11px;font-weight:600;padding:.4rem 1rem;
+  border-radius:20px;letter-spacing:2px;margin-bottom:1rem;
+  border:1px solid rgba(212,175,55,0.2);
+}
+.done-wrap h2{font-family:'Cairo',sans-serif;font-size:24px;font-weight:900;color:var(--gold);margin-bottom:.6rem}
+.done-wrap p{font-family:'Cairo',sans-serif;font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:1.25rem}
+
+/* ─── Send Status ─── */
+.send-status{
+  margin:1rem auto;padding:.75rem 1.25rem;border-radius:10px;
+  font-family:'Cairo',sans-serif;font-size:13px;font-weight:500;
+  display:none;max-width:380px;
+}
+.send-status.sending{background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.1);color:var(--gold-muted);display:block}
+.send-status.success{background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.15);color:var(--emerald);display:block}
+.send-status.failed{background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.15);color:#e74c3c;display:block}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg-primary)}
+::-webkit-scrollbar-thumb{background:rgba(212,175,55,0.3);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(212,175,55,0.5)}
+
+/* ─── Responsive ─── */
+@media(max-width:480px){
+  .wrap{padding:1rem .75rem 3rem}
+  .hero{padding:2rem 1.25rem 1.5rem}
+  .q-card{padding:1.4rem 1.2rem}
+  .scale-btn{width:40px;height:40px;font-size:13px}
+}
+</style>
+</head>
+<body>
+
+<!-- Floating Particles -->
+<div class="particles" id="particles"></div>
+
+<div class="wrap">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-crown">👑</div>
+    <div class="hero-logo">EMPIRE ENGLISH COMMUNITY</div>
+    <h1>رحلتك تبدأ من هنا</h1>
+    <p>النموذج ده مش استبيان عادي — ده بداية طريقك الحقيقي.<br>خد وقتك وكن صريح مع نفسك.</p>
+    <div class="prog-wrap">
+      <div class="prog-bar"><div class="prog-fill" id="prog" style="width:10%"></div></div>
+      <div class="prog-label" id="prog_lbl">السؤال ١ من ٩</div>
+    </div>
+  </div>
+
+  <!-- Step 1: Name -->
+  <div id="s1" class="step active">
+    <div class="q-card">
+      <div class="q-num">TRIAL I</div>
+      <div class="q-label">إيه اسمك؟</div>
+      <div class="q-hint">الاسم الأول يكفي تمام 😊</div>
+      <input type="text" id="f_name" placeholder="اكتب اسمك هنا...">
+      <div class="err" id="e1">✗ من فضلك اكتب اسمك</div>
+    </div>
+    <div class="nav">
+      <div class="step-lbl">I / IX</div>
+      <button class="btn-next" onclick="next(1)">التالي ←</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Goal -->
+  <div id="s2" class="step">
+    <div class="q-card">
+      <div class="q-num">TRIAL II</div>
+      <div class="q-label">إيه هدفك الأساسي من تعلم الإنجليزي؟</div>
+      <div class="q-hint">مثال: عايز أتكلم بطلاقة في الشغل / عايز أعدي انترفيو / عايز أسافر / عايز أفهم أفلام بدون ترجمة</div>
+      <textarea id="f_goal" placeholder="اكتب هدفك هنا..."></textarea>
+      <div class="err" id="e2">✗ من فضلك اكتب هدفك</div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="back(2)">→ رجوع</button>
+      <div class="step-lbl">II / IX</div>
+      <button class="btn-next" onclick="next(2)">التالي ←</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Why -->
+  <div id="s3" class="step">
+    <div class="q-card">
+      <div class="q-num">TRIAL III</div>
+      <div class="q-label">ليه الهدف ده مهم بالنسبالك فعلًا؟</div>
+      <div class="q-hint">مش محتاج إجابة رسمية — قولنا الكلام الجوّاني الحقيقي 💬</div>
+      <textarea id="f_why" placeholder="عشان..."></textarea>
+      <div class="err" id="e3">✗ من فضلك اكتب سبب حقيقي</div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="back(3)">→ رجوع</button>
+      <div class="step-lbl">III / IX</div>
+      <button class="btn-next" onclick="next(3)">التالي ←</button>
+    </div>
+  </div>
+
+  <!-- Step 4: Future -->
+  <div id="s4" class="step">
+    <div class="q-card">
+      <div class="q-num">TRIAL IV</div>
+      <div class="q-label">إيه اللي هيحصل في حياتك لو حققت الهدف ده؟</div>
+      <div class="q-hint">تخيّل نفسك بعد سنة — إيه اللي هيتغير في شغلك / حياتك / ثقتك بنفسك؟ ✨</div>
+      <textarea id="f_future" placeholder="لو حققت هدفي هـ..."></textarea>
+      <div class="err" id="e4">✗ من فضلك اكتب تصورك للمستقبل</div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="back(4)">→ رجوع</button>
+      <div class="step-lbl">IV / IX</div>
+      <button class="btn-next" onclick="next(4)">التالي ←</button>
+    </div>
+  </div>
+
+  <!-- Step 5: Risk -->
+  <div id="s5" class="step">
+    <div class="q-card">
+      <div class="q-num">TRIAL V</div>
+      <div class="q-label">إيه اللي ممكن تخسره لو ما التزمتش؟</div>
+      <div class="q-hint">الصدق مع نفسك هنا بيخليك تلتزم أكتر — مش هنحكم على حد 🔒</div>
+      <textarea id="f_risk" placeholder="لو ما التزمتش هـ..."></textarea>
+      <div class="err" id="e5">✗ من فضلك اكتب إجابتك</div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="back(5)">→ رجوع</button>
+      <div class="step-lbl">V / IX</div>
+      <button class="btn-next" onclick="next(5)">التالي ←</button>
+    </div>
+  </div>
+
+  <!-- Step 6: Scale -->
+  <div id="s6" class="step">
+    <div class="q-card">
+      <div class="q-num">TRIAL VI</div>
+      <div class="q-label">من 1 لـ 10 — قد إيه إنت جاد في تحقيق الهدف ده؟</div>
+      <div class="q-hint">اختار الرقم اللي بيعبّر عنك فعلًا — مفيش إجابة غلط.</div>
+      <div class="scale-wrap">
+        <button class="scale-btn" onclick="setScale(1)">1</button>
+        <button class="scale-btn" onclick="setScale(2)">2</button>
+        <button class="scale-btn" onclick="setScale(3)">3</button>
+        <button class="scale-btn" onclick="setScale(4)">4</button>
+        <button class="scale-btn" onclick="setScale(5)">5</button>
+        <button class="scale-btn" onclick="setScale(6)">6</button>
+        <button class="scale-btn" onclick="setScale(7)">7</button>
+        <button class="scale-btn" onclick="setScale(8)">8</button>
+        <button class="scale-btn" onclick="setScale(9)">9</button>
+        <button class="scale-btn" onclick="setScale(10)">10</button>
+      </div>
+      <div class="scale-labels"><span>مش مهتم أوي</span><span>جاد جدًا 🔥</span></div>
+      <div class="scale-sub">
+        <label>وليه اخترت الرقم ده؟</label>
+        <textarea id="f_scale_why" style="min-height:75px" placeholder="لأن..."></textarea>
+      </div>
+      <div class="err" id="e6">✗ من فضلك اختار رقم واكتب سببه</div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="back(6)">→ رجوع</button>
+      <div class="step-lbl">VI / IX</div>
+      <button class="btn-next" onclick="next(6)">التالي ←</button>
+    </div>
+  </div>
+
+  <!-- Step 7: Obstacle -->
+  <div id="s7" class="step">
+    <div class="q-card">
+      <div class="q-num">TRIAL VII</div>
+      <div class="q-label">إيه أكبر تحدي ممكن يمنعك من الالتزام؟</div>
+      <div class="q-hint">مثال: الوقت / الكسل / مش عارف من فين أبدأ / خايف من الغلط أمام الناس</div>
+      <textarea id="f_obstacle" placeholder="أكبر تحدي هو..."></textarea>
+      <div class="err" id="e7">✗ من فضلك اكتب إجابتك</div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="back(7)">→ رجوع</button>
+      <div class="step-lbl">VII / IX</div>
+      <button class="btn-next" onclick="next(7)">التالي ←</button>
+    </div>
+  </div>
+
+  <!-- Step 8: Commitment -->
+  <div id="s8" class="step">
+    <div class="q-card">
+      <div class="q-num">TRIAL VIII</div>
+      <div class="q-label">التزامك مع Empire English Community</div>
+      <div class="q-hint">أكمّل الجملة دي بصدق — ده عقدك مع نفسك 📝</div>
+      <div class="commit-prefix">أنا ملتزم إني...</div>
+      <textarea id="f_commit" placeholder="أنا ملتزم إني..."></textarea>
+      <div class="err" id="e8">✗ من فضلك اكتب التزامك</div>
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="back(8)">→ رجوع</button>
+      <div class="step-lbl">VIII / IX</div>
+      <button class="btn-next" onclick="next(8)">التالي ←</button>
+    </div>
+  </div>
+
+  <!-- Step 9: Habit + Message -->
+  <div id="s9" class="step">
+    <div class="q-card">
+      <div class="q-num">TRIAL IX</div>
+      <div class="q-label">عادة يومية واحدة هتبدأ تعملها من النهارده</div>
+      <div class="q-hint">لازم تكون عملية وبسيطة. مثال: هسمع podcast إنجليزي ١٠ دقايق كل صبح ☀️</div>
+      <textarea id="f_habit" style="min-height:80px" placeholder="من النهارده هـ..."></textarea>
+      <div class="err" id="e9">✗ من فضلك اكتب عادتك اليومية</div>
+    </div>
+    <div class="q-card" style="border-right:3px solid var(--gold)">
+      <div class="q-label" style="font-size:15px;margin-bottom:.5rem">💌 رسالة لنفسك في المستقبل</div>
+      <div class="q-hint">جملة واحدة تحفيزية من قلبك لنفسك — هتشوفها لما تحقق هدفك.</div>
+      <textarea id="f_msg" style="min-height:70px" placeholder="اكتب لنفسك..."></textarea>
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="back(9)">→ رجوع</button>
+      <div class="step-lbl">IX / IX</div>
+      <button class="btn-next" id="submit_btn" onclick="submitForm()" style="background:linear-gradient(135deg,var(--gold),#085041)">إرسال وابدأ رحلتك ✓</button>
+    </div>
+  </div>
+
+  <!-- Done -->
+  <div id="sdone" class="step">
+    <div class="done-wrap">
+      <div class="done-icon">👑</div>
+      <div class="done-badge">EMPIRE ENGLISH COMMUNITY</div>
+      <h2 id="done_name">أهلًا بيك!</h2>
+      <p>إجاباتك اتسجّلت بنجاح ✅<br>فريق EEC هيراجع ملفك الشخصي ويتواصل معاك قريب للـ coaching session الأول.</p>
+      <div class="send-status" id="send_status"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── Particles Generator ───
+(function(){
+  var container = document.getElementById('particles');
+  for(var i = 0; i < 25; i++){
+    var p = document.createElement('div');
+    p.className = 'particle';
+    p.style.setProperty('--x', Math.random()*100 + '%');
+    p.style.setProperty('--dur', (15 + Math.random()*20) + 's');
+    p.style.setProperty('--delay', (Math.random()*15) + 's');
+    p.style.width = (1 + Math.random()*2) + 'px';
+    p.style.height = p.style.width;
+    container.appendChild(p);
+  }
+})();
+
+// ─── Form Logic ───
+var SHEET_URL = "https://script.google.com/macros/s/AKfycbxeDcXQputF2yvKIBy9O1dJUuIAEVGzYpmLGUCMvDHDsP3IIeewl_YmiZMvENzgnnme/exec";
+
+var cur = 1;
+var scaleVal = 0;
+var answers = {};
+var progs = [10,21,32,43,54,65,76,87,98];
+var stepLabels = ['١','٢','٣','٤','٥','٦','٧','٨','٩'];
+
+function showStep(n) {
+  for (var i = 1; i <= 9; i++) {
+    var el = document.getElementById('s' + i);
+    if (el) el.classList.remove('active');
+  }
+  var done = document.getElementById('sdone');
+  if (n === 'done') {
+    done.classList.add('active');
+    document.getElementById('prog').style.width = '100%';
+    document.getElementById('prog_lbl').textContent = 'اكتمل ✓';
+  } else {
+    done.classList.remove('active');
+    var s = document.getElementById('s' + n);
+    if (s) s.classList.add('active');
+    document.getElementById('prog').style.width = progs[n-1] + '%';
+    document.getElementById('prog_lbl').textContent = 'السؤال ' + stepLabels[n-1] + ' من ٩';
+  }
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function setScale(n) {
+  scaleVal = n;
+  document.querySelectorAll('.scale-btn').forEach(function(b, i) {
+    b.classList.toggle('sel', i + 1 === n);
+  });
+}
+
+function getVal(id) {
+  var el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function showErr(n, show) {
+  var el = document.getElementById('e' + n);
+  if (el) el.style.display = show ? 'block' : 'none';
+}
+
+function next(n) {
+  var fids = {1:'f_name',2:'f_goal',3:'f_why',4:'f_future',5:'f_risk',7:'f_obstacle',8:'f_commit',9:'f_habit'};
+  if (n === 6) {
+    if (!scaleVal || !getVal('f_scale_why')) { showErr(6, true); return; }
+    answers.commitment_scale = scaleVal;
+    answers.scale_reason = getVal('f_scale_why');
+    showErr(6, false);
+  } else if (fids[n]) {
+    var v = getVal(fids[n]);
+    if (!v) { showErr(n, true); return; }
+    showErr(n, false);
+    var keys = {1:'name',2:'goal',3:'why',4:'future',5:'risk',7:'obstacle',8:'commitment',9:'habit'};
+    if (keys[n]) answers[keys[n]] = v;
+  }
+  cur = n + 1;
+  showStep(cur);
+}
+
+function back(n) { cur = n - 1; showStep(cur); }
+
+function submitForm() {
+  var hab = getVal('f_habit');
+  if (!hab) { showErr(9, true); return; }
+  showErr(9, false);
+  answers.habit = hab;
+  answers.message = getVal('f_msg');
+  answers.timestamp = new Date().toLocaleString('ar-EG');
+
+  var nameEl = document.getElementById('done_name');
+  if (nameEl) nameEl.textContent = 'أهلًا بيك يا ' + (answers.name || '') + '! 👑';
+
+  var btn = document.getElementById('submit_btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'جاري الإرسال...'; }
+
+  showStep('done');
+
+  var st = document.getElementById('send_status');
+  st.className = 'send-status sending';
+  st.textContent = '⏳ جاري إرسال بياناتك...';
+
+  fetch(SHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(answers)
+  }).then(function() {
+    st.className = 'send-status success';
+    st.textContent = '✅ تم الإرسال بنجاح — بياناتك وصلت لفريق EEC!';
+  }).catch(function() {
+    st.className = 'send-status failed';
+    st.textContent = '⚠️ فيه مشكلة في الاتصال — حاول تاني أو تواصل مع فريق EEC.';
+  });
+}
+</script>
+</body>
+</html>
