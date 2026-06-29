@@ -9,6 +9,7 @@
 <title>Empire English Community — نموذج الانضمام</title>
 <link rel="icon" href="https://empireenglish.online/logo-sm.png">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Cinzel:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 /* ═══ EMPIRE DESIGN SYSTEM — Dark/Gold Theme ═══ */
 :root {
@@ -271,6 +272,13 @@ textarea::placeholder,input::placeholder{color:rgba(139,145,154,0.5)}
       <div class="q-label">إيه اسمك؟</div>
       <div class="q-hint">الاسم الأول يكفي تمام 😊</div>
       <input type="text" id="f_name" placeholder="اكتب اسمك هنا...">
+      <!-- Telegram username fallback (hidden when opened from Telegram) -->
+      <div id="tg_fallback" style="display:none;margin-top:1rem">
+        <div class="q-hint" style="margin-bottom:.6rem;border-right-color:var(--bronze)">
+          عشان نبعتلك البوستر على تيليجرام — اكتب الـ username بتاعك (بدون @)
+        </div>
+        <input type="text" id="f_tg_username" placeholder="مثال: ahmed_ali" style="direction:ltr;text-align:left">
+      </div>
       <div class="err" id="e1">✗ من فضلك اكتب اسمك</div>
     </div>
     <div class="nav">
@@ -435,7 +443,7 @@ textarea::placeholder,input::placeholder{color:rgba(139,145,154,0.5)}
       <div class="done-icon">👑</div>
       <div class="done-badge">EMPIRE ENGLISH COMMUNITY</div>
       <h2 id="done_name">أهلًا بيك!</h2>
-      <p>إجاباتك اتسجّلت بنجاح ✅<br>فريق EEC هيراجع ملفك الشخصي ويتواصل معاك قريب للـ coaching session الأول.</p>
+      <p>إجاباتك اتسجّلت بنجاح ✅<br>البوستر بتاع أهدافك هيوصلك على تيليجرام خلال ثواني 🎨<br><span style="font-size:12px;color:var(--gold-muted)">علّقه في مكان تشوفه كل يوم!</span></p>
       <div class="send-status" id="send_status"></div>
     </div>
   </div>
@@ -443,6 +451,38 @@ textarea::placeholder,input::placeholder{color:rgba(139,145,154,0.5)}
 </div>
 
 <script>
+// ─── Telegram WebApp Detection ───
+var tgUser = null;
+var isFromTelegram = false;
+
+(function detectTelegram() {
+  try {
+    if (window.Telegram && window.Telegram.WebApp) {
+      var webapp = window.Telegram.WebApp;
+      webapp.ready();
+      webapp.expand(); // Full screen
+
+      if (webapp.initDataUnsafe && webapp.initDataUnsafe.user) {
+        tgUser = webapp.initDataUnsafe.user;
+        isFromTelegram = true;
+        // Auto-fill name if available
+        var nameField = document.getElementById('f_name');
+        if (nameField && tgUser.first_name) {
+          nameField.value = tgUser.first_name;
+        }
+        // Set theme to match Telegram dark mode
+        document.body.style.backgroundColor = webapp.backgroundColor || '#0A0A0F';
+      }
+    }
+  } catch(e) {}
+
+  // Show fallback username field if NOT from Telegram
+  if (!isFromTelegram) {
+    var fb = document.getElementById('tg_fallback');
+    if (fb) fb.style.display = 'block';
+  }
+})();
+
 // ─── Particles Generator ───
 (function(){
   var container = document.getElementById('particles');
@@ -460,6 +500,7 @@ textarea::placeholder,input::placeholder{color:rgba(139,145,154,0.5)}
 
 // ─── Form Logic ───
 var SHEET_URL = "https://script.google.com/macros/s/AKfycbxeDcXQputF2yvKIBy9O1dJUuIAEVGzYpmLGUCMvDHDsP3IIeewl_YmiZMvENzgnnme/exec";
+var N8N_WEBHOOK = "https://bot.empireenglish.online/webhook/goal-form";
 
 var cur = 1;
 var scaleVal = 0;
@@ -530,7 +571,19 @@ function submitForm() {
   showErr(9, false);
   answers.habit = hab;
   answers.message = getVal('f_msg');
-  answers.timestamp = new Date().toLocaleString('ar-EG');
+  answers.timestamp = new Date().toISOString();
+
+  // Attach Telegram user data
+  if (isFromTelegram && tgUser) {
+    answers.telegram_id = String(tgUser.id);
+    answers.telegram_username = tgUser.username || '';
+    answers.telegram_first_name = tgUser.first_name || '';
+    answers.source = 'telegram_webapp';
+  } else {
+    answers.telegram_username = getVal('f_tg_username');
+    answers.telegram_id = '';
+    answers.source = 'web_direct';
+  }
 
   var nameEl = document.getElementById('done_name');
   if (nameEl) nameEl.textContent = 'أهلًا بيك يا ' + (answers.name || '') + '! 👑';
@@ -542,21 +595,40 @@ function submitForm() {
 
   var st = document.getElementById('send_status');
   st.className = 'send-status sending';
-  st.textContent = '⏳ جاري إرسال بياناتك...';
+  st.textContent = '⏳ جاري إرسال بياناتك وتحضير البوستر...';
 
+  // Send to n8n webhook (primary — triggers poster generation)
+  fetch(N8N_WEBHOOK, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(answers)
+  }).then(function(r) {
+    if (r.ok) {
+      st.className = 'send-status success';
+      st.textContent = '✅ تم بنجاح! البوستر هيوصلك على تيليجرام خلال ثواني 🎨';
+      // Close Telegram WebApp after short delay
+      if (isFromTelegram && window.Telegram && window.Telegram.WebApp) {
+        setTimeout(function() {
+          window.Telegram.WebApp.close();
+        }, 3000);
+      }
+    } else {
+      throw new Error('not ok');
+    }
+  }).catch(function() {
+    st.className = 'send-status failed';
+    st.textContent = '⚠️ فيه مشكلة — لكن بياناتك اتسجلت. تواصل مع فريق EEC.';
+  });
+
+  // Also send to Google Sheets (backup)
   fetch(SHEET_URL, {
     method: 'POST',
     mode: 'no-cors',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(answers)
-  }).then(function() {
-    st.className = 'send-status success';
-    st.textContent = '✅ تم الإرسال بنجاح — بياناتك وصلت لفريق EEC!';
-  }).catch(function() {
-    st.className = 'send-status failed';
-    st.textContent = '⚠️ فيه مشكلة في الاتصال — حاول تاني أو تواصل مع فريق EEC.';
-  });
+  }).catch(function(){});
 }
+</script>
 </script>
 </body>
 </html>

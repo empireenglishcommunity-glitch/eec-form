@@ -1,0 +1,144 @@
+{
+  "name": "Empire Goal Poster — Form → Poster → Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "goal-form",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": false
+        }
+      },
+      "id": "webhook1",
+      "name": "Webhook — Goal Form",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 400],
+      "webhookId": "goal-form"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"status\":\"ok\",\"message\":\"Poster is being generated\"}",
+        "options": {}
+      },
+      "id": "respond1",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [420, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build the Empire-style goal poster as HTML\nconst data = $input.first().json.body || $input.first().json;\n\nconst name = data.name || 'مواطن الإمبراطورية';\nconst goal = data.goal || '';\nconst why = data.why || '';\nconst future = data.future || '';\nconst commitment = data.commitment || '';\nconst habit = data.habit || '';\nconst message = data.message || '';\nconst scale = data.commitment_scale || '?';\nconst telegram_id = data.telegram_id || '';\nconst telegram_username = data.telegram_username || '';\n\n// Date in Arabic\nconst now = new Date();\nconst dateStr = now.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });\n\nconst html = `\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<style>\n@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Cinzel:wght@600;700;900&display=swap');\n\n* { margin: 0; padding: 0; box-sizing: border-box; }\n\nbody {\n  width: 1080px;\n  height: 1920px;\n  background: #0A0A0F;\n  font-family: 'Cairo', sans-serif;\n  direction: rtl;\n  position: relative;\n  overflow: hidden;\n}\n\n/* Background effects */\nbody::before {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background:\n    radial-gradient(ellipse at 30% 20%, rgba(212,175,55,0.06) 0%, transparent 50%),\n    radial-gradient(ellipse at 70% 80%, rgba(212,175,55,0.04) 0%, transparent 50%);\n}\n\n/* Gold border frame */\n.frame {\n  position: absolute;\n  inset: 30px;\n  border: 2px solid rgba(212,175,55,0.4);\n  border-radius: 20px;\n}\n.frame::after {\n  content: '';\n  position: absolute;\n  inset: 8px;\n  border: 1px solid rgba(212,175,55,0.15);\n  border-radius: 16px;\n}\n\n.content {\n  position: relative;\n  z-index: 1;\n  padding: 80px 60px;\n  height: 100%;\n  display: flex;\n  flex-direction: column;\n}\n\n/* Header */\n.header {\n  text-align: center;\n  margin-bottom: 40px;\n}\n.crown { font-size: 56px; margin-bottom: 12px; }\n.brand {\n  font-family: 'Cinzel', serif;\n  font-size: 18px;\n  letter-spacing: 4px;\n  color: rgba(212,175,55,0.6);\n  margin-bottom: 16px;\n}\n.title {\n  font-size: 42px;\n  font-weight: 900;\n  background: linear-gradient(135deg, #D4AF37, #e8d48b, #D4AF37);\n  -webkit-background-clip: text;\n  -webkit-text-fill-color: transparent;\n  background-clip: text;\n  margin-bottom: 8px;\n}\n.subtitle {\n  font-size: 20px;\n  color: #8B919A;\n}\n.name-badge {\n  display: inline-block;\n  margin-top: 16px;\n  padding: 8px 32px;\n  border: 1.5px solid rgba(212,175,55,0.4);\n  border-radius: 30px;\n  color: #D4AF37;\n  font-size: 24px;\n  font-weight: 700;\n  background: rgba(212,175,55,0.05);\n}\n\n/* Divider */\n.divider {\n  height: 1px;\n  background: linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent);\n  margin: 30px 0;\n}\n\n/* Goal sections */\n.section {\n  margin-bottom: 28px;\n}\n.section-icon {\n  font-size: 22px;\n  margin-left: 8px;\n}\n.section-label {\n  font-size: 14px;\n  font-weight: 600;\n  color: rgba(212,175,55,0.7);\n  letter-spacing: 1px;\n  margin-bottom: 8px;\n  text-transform: uppercase;\n  font-family: 'Cinzel', serif;\n}\n.section-text {\n  font-size: 22px;\n  font-weight: 600;\n  color: #F5F0E8;\n  line-height: 1.7;\n  padding: 16px 20px;\n  background: rgba(17,17,24,0.8);\n  border: 1px solid rgba(212,175,55,0.1);\n  border-radius: 12px;\n  border-right: 3px solid #D4AF37;\n}\n\n/* Scale badge */\n.scale-badge {\n  display: inline-flex;\n  align-items: center;\n  gap: 12px;\n  padding: 12px 24px;\n  background: rgba(212,175,55,0.08);\n  border: 1.5px solid rgba(212,175,55,0.3);\n  border-radius: 12px;\n  margin-bottom: 28px;\n}\n.scale-num {\n  font-size: 36px;\n  font-weight: 900;\n  color: #D4AF37;\n}\n.scale-label {\n  font-size: 16px;\n  color: #8B919A;\n}\n\n/* Habit card */\n.habit-card {\n  background: rgba(212,175,55,0.05);\n  border: 1.5px solid rgba(212,175,55,0.2);\n  border-radius: 14px;\n  padding: 20px 24px;\n  text-align: center;\n  margin-bottom: 28px;\n}\n.habit-text {\n  font-size: 22px;\n  font-weight: 700;\n  color: #D4AF37;\n  line-height: 1.6;\n}\n\n/* Message */\n.message-box {\n  background: rgba(13,17,23,0.8);\n  border: 1px solid rgba(212,175,55,0.15);\n  border-radius: 12px;\n  padding: 20px;\n  text-align: center;\n  margin-top: auto;\n}\n.message-text {\n  font-size: 20px;\n  font-style: italic;\n  color: #e8d48b;\n  line-height: 1.6;\n}\n.message-label {\n  font-size: 13px;\n  color: #8B919A;\n  margin-top: 8px;\n}\n\n/* Footer */\n.footer {\n  text-align: center;\n  margin-top: 30px;\n  padding-top: 20px;\n  border-top: 1px solid rgba(212,175,55,0.1);\n}\n.footer-text {\n  font-family: 'Cinzel', serif;\n  font-size: 13px;\n  color: rgba(212,175,55,0.4);\n  letter-spacing: 3px;\n}\n.footer-date {\n  font-size: 13px;\n  color: #8B919A;\n  margin-top: 6px;\n}\n</style>\n</head>\n<body>\n<div class=\"frame\"></div>\n<div class=\"content\">\n\n  <div class=\"header\">\n    <div class=\"crown\">👑</div>\n    <div class=\"brand\">EMPIRE ENGLISH COMMUNITY</div>\n    <div class=\"title\">ميثاق الأهداف</div>\n    <div class=\"subtitle\">Goal Covenant</div>\n    <div class=\"name-badge\">${name}</div>\n  </div>\n\n  <div class=\"divider\"></div>\n\n  <div class=\"section\">\n    <div class=\"section-label\"><span class=\"section-icon\">🎯</span> هدفي</div>\n    <div class=\"section-text\">${goal}</div>\n  </div>\n\n  <div class=\"section\">\n    <div class=\"section-label\"><span class=\"section-icon\">💡</span> ليه مهم</div>\n    <div class=\"section-text\">${why}</div>\n  </div>\n\n  <div class=\"scale-badge\">\n    <div class=\"scale-num\">${scale}/10</div>\n    <div class=\"scale-label\">مستوى الجدية</div>\n  </div>\n\n  <div class=\"section\">\n    <div class=\"section-label\"><span class=\"section-icon\">✊</span> التزامي</div>\n    <div class=\"section-text\">${commitment}</div>\n  </div>\n\n  <div class=\"habit-card\">\n    <div class=\"section-label\" style=\"margin-bottom:12px\"><span class=\"section-icon\">☀️</span> عادتي اليومية</div>\n    <div class=\"habit-text\">${habit}</div>\n  </div>\n\n  ${message ? `\n  <div class=\"message-box\">\n    <div class=\"message-text\">\"${message}\"</div>\n    <div class=\"message-label\">💌 رسالة لنفسي في المستقبل</div>\n  </div>\n  ` : ''}\n\n  <div class=\"footer\">\n    <div class=\"footer-text\">EMPIRE ENGLISH COMMUNITY</div>\n    <div class=\"footer-date\">${dateStr}</div>\n  </div>\n\n</div>\n</body>\n</html>\n`;\n\nreturn [{\n  json: {\n    html: html,\n    telegram_id: telegram_id,\n    telegram_username: telegram_username,\n    name: name\n  }\n}];"
+      },
+      "id": "code_poster",
+      "name": "Generate Poster HTML",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [640, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hcti.io/v1/image",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"html\": {{ JSON.stringify($json.html) }}, \"css\": \"\", \"google_fonts\": \"Cairo|Cinzel\", \"viewport_width\": 1080, \"viewport_height\": 1920, \"device_scale\": 1}"
+      },
+      "id": "html_to_img",
+      "name": "HTML → Image (hcti.io)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [860, 400],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "CRED_HCTI",
+          "name": "HCTI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract image URL and prepare Telegram sendPhoto payload\nconst prevData = $('Generate Poster HTML').first().json;\nconst imgResponse = $input.first().json;\nconst imageUrl = imgResponse.url || '';\n\nconst chatId = prevData.telegram_id;\nconst name = prevData.name;\n\nif (!chatId) {\n  // No telegram_id — skip sending (user opened from web without telegram)\n  return [{ json: { skip: true, reason: 'no_telegram_id', imageUrl } }];\n}\n\nreturn [{\n  json: {\n    chat_id: chatId,\n    photo: imageUrl,\n    caption: `👑 ميثاق أهدافك جاهز يا ${name}!\\n\\nعلّق البوستر ده في مكان تشوفه كل يوم — خلّيه تذكير دائم بالتزامك.\\n\\n🏛 Empire English Community`,\n    imageUrl: imageUrl\n  }\n}];"
+      },
+      "id": "code_send",
+      "name": "Prepare Telegram Send",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1080, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "notEquals" }
+            }
+          ]
+        }
+      },
+      "id": "if_has_tg",
+      "name": "Has Telegram ID?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1300, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.telegram.org/bot8938310982:AAFAXq5xDhY0XlpGw6ag6Xz6pI8aAM3f4Nk/sendPhoto",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"chat_id\": {{ $json.chat_id }}, \"photo\": {{ JSON.stringify($json.photo) }}, \"caption\": {{ JSON.stringify($json.caption) }}, \"parse_mode\": \"HTML\"}"
+      },
+      "id": "send_photo",
+      "name": "Send Poster via Telegram",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1520, 340]
+    }
+  ],
+  "connections": {
+    "Webhook — Goal Form": {
+      "main": [
+        [
+          { "node": "Respond OK", "type": "main", "index": 0 },
+          { "node": "Generate Poster HTML", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Generate Poster HTML": {
+      "main": [
+        [{ "node": "HTML → Image (hcti.io)", "type": "main", "index": 0 }]
+      ]
+    },
+    "HTML → Image (hcti.io)": {
+      "main": [
+        [{ "node": "Prepare Telegram Send", "type": "main", "index": 0 }]
+      ]
+    },
+    "Prepare Telegram Send": {
+      "main": [
+        [{ "node": "Has Telegram ID?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Has Telegram ID?": {
+      "main": [
+        [{ "node": "Send Poster via Telegram", "type": "main", "index": 0 }],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "staticData": null
+}
