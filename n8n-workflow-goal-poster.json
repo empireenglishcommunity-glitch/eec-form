@@ -1,6 +1,6 @@
 {
-  "id": "501",
   "name": "Empire Goal Poster — Form → Poster → Telegram",
+  "active": false,
   "nodes": [
     {
       "parameters": {
