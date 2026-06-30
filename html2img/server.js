@@ -40,7 +40,7 @@ app.post('/convert', async (req, res) => {
   try {
     const b = await getBrowser();
     page = await b.newPage();
-    await page.setViewport({ width: Number(width), height: Number(height), deviceScaleFactor: 1 });
+    await page.setViewport({ width: Number(width), height: Number(height), deviceScaleFactor: 2 });
     await page.setContent(html, { waitUntil: 'networkidle0', timeout: 15000 });
 
     // Wait for fonts to load
