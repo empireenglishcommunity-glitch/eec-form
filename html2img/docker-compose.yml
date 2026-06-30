@@ -5,9 +5,9 @@ services:
     container_name: empire-html2img
     restart: unless-stopped
     ports:
-      - "3100:3100"
+      - "3200:3200"
     environment:
-      - PORT=3100
+      - PORT=3200
     deploy:
       resources:
         limits:
