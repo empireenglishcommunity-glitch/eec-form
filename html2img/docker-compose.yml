@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  html2img:
+    build: .
+    container_name: empire-html2img
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    environment:
+      - PORT=3100
+    deploy:
+      resources:
+        limits:
+          memory: 512M

@@ -43,28 +43,27 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://hcti.io/v1/image",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBasicAuth",
+        "url": "http://empire-html2img:3100/convert",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\"html\": {{ JSON.stringify($json.html) }}, \"css\": \"\", \"google_fonts\": \"Cairo|Cinzel\", \"viewport_width\": 1080, \"viewport_height\": 1920, \"device_scale\": 1}"
+        "jsonBody": "={\"html\": {{ JSON.stringify($json.html) }}, \"width\": 1080, \"height\": 1920}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
       },
       "id": "html_to_img",
-      "name": "HTML → Image (hcti.io)",
+      "name": "HTML → Image (Self-Hosted)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [860, 400],
-      "credentials": {
-        "httpBasicAuth": {
-          "id": "CRED_HCTI",
-          "name": "HCTI API"
-        }
-      }
+      "position": [860, 400]
     },
     {
       "parameters": {
-        "jsCode": "// Extract image URL and prepare Telegram sendPhoto payload\nconst prevData = $('Generate Poster HTML').first().json;\nconst imgResponse = $input.first().json;\nconst imageUrl = imgResponse.url || '';\n\nconst chatId = prevData.telegram_id;\nconst name = prevData.name;\n\nif (!chatId) {\n  // No telegram_id — skip sending (user opened from web without telegram)\n  return [{ json: { skip: true, reason: 'no_telegram_id', imageUrl } }];\n}\n\nreturn [{\n  json: {\n    chat_id: chatId,\n    photo: imageUrl,\n    caption: `👑 ميثاق أهدافك جاهز يا ${name}!\\n\\nعلّق البوستر ده في مكان تشوفه كل يوم — خلّيه تذكير دائم بالتزامك.\\n\\n🏛 Empire English Community`,\n    imageUrl: imageUrl\n  }\n}];"
+        "jsCode": "// Prepare Telegram sendPhoto — image comes as binary from html2img\nconst prevData = $('Generate Poster HTML').first().json;\nconst chatId = prevData.telegram_id;\nconst name = prevData.name;\n\nif (!chatId) {\n  return [{ json: { skip: true, reason: 'no_telegram_id' } }];\n}\n\nreturn [{\n  json: {\n    chat_id: chatId,\n    caption: `👑 ميثاق أهدافك جاهز يا ${name}!\\n\\nعلّق البوستر ده في مكان تشوفه كل يوم — خلّيه تذكير دائم بالتزامك.\\n\\n🏛 Empire English Community`,\n    name: name\n  },\n  binary: $input.first().binary\n}];"
       },
       "id": "code_send",
       "name": "Prepare Telegram Send",
@@ -93,17 +92,26 @@
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "=https://api.telegram.org/bot8938310982:AAFAXq5xDhY0XlpGw6ag6Xz6pI8aAM3f4Nk/sendPhoto",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\"chat_id\": {{ $json.chat_id }}, \"photo\": {{ JSON.stringify($json.photo) }}, \"caption\": {{ JSON.stringify($json.caption) }}, \"parse_mode\": \"HTML\"}"
+        "resource": "message",
+        "operation": "sendPhoto",
+        "chatId": "={{ $json.chat_id }}",
+        "binaryData": true,
+        "binaryPropertyName": "data",
+        "additionalFields": {
+          "caption": "={{ $json.caption }}"
+        }
       },
       "id": "send_photo",
       "name": "Send Poster via Telegram",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [1520, 340]
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1520, 340],
+      "credentials": {
+        "telegramApi": {
+          "id": "CRED_TELEGRAM",
+          "name": "Telegram account"
+        }
+      }
     }
   ],
   "connections": {
